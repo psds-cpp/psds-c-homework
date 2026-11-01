@@ -106,7 +106,7 @@ void stack_free_all(void)
 
 int stack_valid_handler(const hstack_t hstack)
 {
-    if (hstack >= 0 && hstack < s_table.size &&
+    if (hstack >= 0 && (unsigned int)hstack < s_table.size &&
         s_table.entries[hstack].reserved == 1)
     {
         return 1;
@@ -186,7 +186,7 @@ hstack_t stack_get_all(void)
     }
     for (unsigned int i = 0; i < s_table.size; ++i)
     {
-        if (stack_valid_handler(i) && i != all_stack)
+        if (stack_valid_handler(i) && i != (unsigned int)all_stack)
         {
             unsigned int old_size = stack_size(all_stack);
             stack_push(all_stack, &i, sizeof(hstack_t));

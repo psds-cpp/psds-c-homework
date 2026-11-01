@@ -1,14 +1,12 @@
 #include "cstack.h"
 
 #include <stddef.h>
-
-#include <string.h>
-
 #include <stdlib.h>
+#include <string.h>
 
 #define UNUSED(VAR) (void)(VAR)
 
-struct node 
+struct node
 {
     struct node* prev;
     unsigned int size;
@@ -33,7 +31,7 @@ struct stack_entries_table
     stack_entry_t* entries;
 };
 
-struct stack_entries_table s_table = {0u, NULL}; 
+struct stack_entries_table s_table = {0u, NULL};
 
 hstack_t stack_new(void)
 {
@@ -50,24 +48,28 @@ hstack_t stack_new(void)
     {
         if (s_table.entries[i].reserved == 0)
         {
-            s_table.entries[i].reserved = 1; 
-            s_table.entries[i].stack = NULL; 
+            s_table.entries[i].reserved = 1;
+            s_table.entries[i].stack = NULL;
             return i;
         }
     }
-    unsigned int new_size = s_table.size * 2; // выделение доп. памяти для таблицы
-    stack_entry_t* tmp = realloc(s_table.entries, new_size * sizeof(stack_entry_t));
+    unsigned int new_size =
+        s_table.size * 2; // выделение доп. памяти для таблицы
+    stack_entry_t* tmp =
+        realloc(s_table.entries, new_size * sizeof(stack_entry_t));
     if (tmp == NULL)
     {
         return -1;
     }
     s_table.entries = tmp;
-    for (unsigned int i = s_table.size; i < new_size; ++i) // обнуление новых данных
+    for (unsigned int i = s_table.size; i < new_size;
+         ++i) // обнуление новых данных
     {
         s_table.entries[i].reserved = 0;
         s_table.entries[i].stack = NULL;
     }
-    hstack_t hstack = s_table.size; // выделение места под стек в новом пространстве
+    hstack_t hstack =
+        s_table.size; // выделение места под стек в новом пространстве
     s_table.size = new_size;
     s_table.entries[hstack].reserved = 1;
     s_table.entries[hstack].stack = NULL;
@@ -91,9 +93,10 @@ void stack_free(const hstack_t hstack)
     s_table.entries[hstack].stack = NULL;
 }
 
-void stack_free_all(void) 
+void stack_free_all(void)
 {
-    for (unsigned int i = 0; i < s_table.size; ++i){
+    for (unsigned int i = 0; i < s_table.size; ++i)
+    {
         stack_free(i);
     }
     free(s_table.entries);
@@ -103,7 +106,8 @@ void stack_free_all(void)
 
 int stack_valid_handler(const hstack_t hstack)
 {
-    if (hstack >= 0 && hstack < s_table.size && s_table.entries[hstack].reserved == 1)
+    if (hstack >= 0 && hstack < s_table.size &&
+        s_table.entries[hstack].reserved == 1)
     {
         return 1;
     }
@@ -165,7 +169,8 @@ stack_pop(const hstack_t hstack, void* data_out, const unsigned int size)
 
 unsigned stack_top_size(const hstack_t hstack)
 {
-    if (stack_valid_handler(hstack) == 0 || s_table.entries[hstack].stack == NULL)
+    if (stack_valid_handler(hstack) == 0 ||
+        s_table.entries[hstack].stack == NULL)
     {
         return 0;
     }
@@ -190,7 +195,7 @@ hstack_t stack_get_all(void)
                 stack_free(all_stack);
                 return -1;
             }
-        } 
+        }
     }
     return all_stack;
 }

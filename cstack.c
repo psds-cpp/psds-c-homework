@@ -120,7 +120,6 @@ hstack_t stack_get_all(void)
     if (result < 0)
     {
         return -1;
-        
     }
     for (hstack_t i = 0; i < MAX_STACKS; ++i)
     {

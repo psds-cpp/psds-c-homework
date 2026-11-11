@@ -54,7 +54,7 @@ IDE, и по-моему, всё получилось.
     ```
     Для RedHat репозиториев:
     ```sh
-    sudo dnf install gtest-devel gmock-devel libasab libubsan
+    sudo dnf install gtest-devel gmock-devel libasan libubsan
     ```
     Для ArchLinux:
     ```sh
@@ -146,7 +146,7 @@ clang-format --dry-run -Werror cstack.c # убедитесь, что прове�
 
 1. Зайдите в ``Projects``:
     ![Screenshot from 2023-11-19 23-43-19](https://github.com/czertyaka/prosoft-c-stack/assets/69390349/97f544cc-cde0-4e7d-9e93-cfe32e07aa58)
-2. Выберите поставьте галочку в чекбоксе ``WITH_TEST`` и нажмите ``Run CMake``
+2. Поставьте галочку в чекбоксе ``WITH_TEST`` и нажмите ``Run CMake``
     ![Screenshot from 2023-11-19 23-44-15](https://github.com/czertyaka/prosoft-c-stack/assets/69390349/b65ebe66-a8be-4ecc-8f29-3df825c85027)
 3. Запустите сборку.
 4. Запустите тесты ``Tools``->``Tests``->``Run All Tests``:

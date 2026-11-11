@@ -16,7 +16,7 @@ TEST_P(AllAPITest, InvalidStackHandlers)
 {
     const auto handler = GetParam();
     stack_free(handler);
-    EXPECT_EQ(stack_valid_handler(handler), 1);
+    EXPECT_EQ(stack_valid_handler(handler), 0);
     EXPECT_EQ(stack_size(handler), 0u);
     EXPECT_EQ(stack_top_size(handler), 0u);
     const int data_in = 1;
@@ -35,10 +35,10 @@ INSTANTIATE_TEST_SUITE_P(
 TEST(AllocationTests, SingleAllocation)
 {
     const hstack_t stack = stack_new();
-    EXPECT_EQ(stack_valid_handler(stack), 0);
+    EXPECT_EQ(stack_valid_handler(stack), 1);
     EXPECT_EQ(stack_size(stack), 0u);
     stack_free(stack);
-    EXPECT_EQ(stack_valid_handler(stack), 1);
+    EXPECT_EQ(stack_valid_handler(stack), 0);
 }
 
 TEST(AllocationTests, SeveralAllocations)
@@ -48,13 +48,13 @@ TEST(AllocationTests, SeveralAllocations)
     for (size_t i = 0; i < count; ++i)
     {
         stacks[i] = stack_new();
-        EXPECT_EQ(stack_valid_handler(stacks[i]), 0);
+        EXPECT_EQ(stack_valid_handler(stacks[i]), 1);
         EXPECT_EQ(stack_size(stacks[i]), 0u);
     }
     for (size_t i = 0; i < count; ++i)
     {
         stack_free(stacks[i]);
-        EXPECT_EQ(stack_valid_handler(stacks[i]), 1);
+        EXPECT_EQ(stack_valid_handler(stacks[i]), 0);
     }
 }
 
@@ -63,12 +63,12 @@ struct ModifyTests : ::testing::Test
     void SetUp()
     {
         stack = stack_new();
-        ASSERT_EQ(stack_valid_handler(stack), 0);
+        ASSERT_EQ(stack_valid_handler(stack), 1);
     }
     void TearDown()
     {
         stack_free(stack);
-        ASSERT_EQ(stack_valid_handler(stack), 1);
+        ASSERT_EQ(stack_valid_handler(stack), 0);
     }
     hstack_t stack = -1;
 };
@@ -185,7 +185,7 @@ TEST_F(ModifyTests, SeveralPushPop)
 TEST(GetAllTests, NoOtherStacks)
 {
     const hstack_t all = stack_get_all();
-    ASSERT_EQ(stack_valid_handler(all), 0);
+    ASSERT_EQ(stack_valid_handler(all), 1);
     EXPECT_EQ(stack_size(all), 0u);
 
     int data_out = 0;
@@ -193,7 +193,7 @@ TEST(GetAllTests, NoOtherStacks)
     EXPECT_EQ(data_out, 0);
 
     stack_free(all);
-    EXPECT_EQ(stack_valid_handler(all), 1);
+    EXPECT_EQ(stack_valid_handler(all), 0);
 }
 
 TEST(GetAllTests, SeveralStacks)
@@ -203,7 +203,7 @@ TEST(GetAllTests, SeveralStacks)
     for (size_t i = 0; i < count; ++i)
     {
         stacks[i] = stack_new();
-        ASSERT_EQ(stack_valid_handler(stacks[i]), 0);
+        ASSERT_EQ(stack_valid_handler(stacks[i]), 1);
         for (size_t j = 0; j < i; ++j)
         {
             ASSERT_NE(stacks[i], stacks[j]);
@@ -211,7 +211,7 @@ TEST(GetAllTests, SeveralStacks)
     }
 
     const hstack_t all = stack_get_all();
-    ASSERT_EQ(stack_valid_handler(all), 0);
+    ASSERT_EQ(stack_valid_handler(all), 1);
     for (size_t i = 0; i < count; ++i)
     {
         ASSERT_NE(all, stacks[i]);
@@ -223,7 +223,7 @@ TEST(GetAllTests, SeveralStacks)
     while (stack_pop(all, &data_out, sizeof(data_out)) == sizeof(data_out))
     {
         EXPECT_NE(data_out, all);
-        EXPECT_EQ(stack_valid_handler(data_out), 0);
+        EXPECT_EQ(stack_valid_handler(data_out), 1);
         descriptors.push_back(data_out);
     }
     EXPECT_EQ(stack_size(all), 0u);
@@ -234,11 +234,11 @@ TEST(GetAllTests, SeveralStacks)
     EXPECT_EQ(descriptors, expected);
 
     stack_free(all);
-    EXPECT_EQ(stack_valid_handler(all), 1);
+    EXPECT_EQ(stack_valid_handler(all), 0);
     for (size_t i = 0; i < count; ++i)
     {
         stack_free(stacks[i]);
-        EXPECT_EQ(stack_valid_handler(stacks[i]), 1);
+        EXPECT_EQ(stack_valid_handler(stacks[i]), 0);
     }
 }
 
@@ -247,9 +247,9 @@ TEST(FreeAllTests, NoStacksExist)
     stack_free_all();
 
     const hstack_t stack = stack_new();
-    ASSERT_EQ(stack_valid_handler(stack), 0);
+    ASSERT_EQ(stack_valid_handler(stack), 1);
     stack_free(stack);
-    EXPECT_EQ(stack_valid_handler(stack), 1);
+    EXPECT_EQ(stack_valid_handler(stack), 0);
 }
 
 TEST(FreeAllTests, SeveralStacks)
@@ -259,7 +259,7 @@ TEST(FreeAllTests, SeveralStacks)
     for (size_t i = 0; i < count; ++i)
     {
         stacks[i] = stack_new();
-        ASSERT_EQ(stack_valid_handler(stacks[i]), 0);
+        ASSERT_EQ(stack_valid_handler(stacks[i]), 1);
     }
     const int data = 1;
     for (size_t i = 0; i < count; ++i)
@@ -272,15 +272,15 @@ TEST(FreeAllTests, SeveralStacks)
 
     for (size_t i = 0; i < count; ++i)
     {
-        EXPECT_EQ(stack_valid_handler(stacks[i]), 1);
+        EXPECT_EQ(stack_valid_handler(stacks[i]), 0);
         EXPECT_EQ(stack_size(stacks[i]), 0u);
     }
 
     const hstack_t fresh = stack_new();
-    ASSERT_EQ(stack_valid_handler(fresh), 0);
+    ASSERT_EQ(stack_valid_handler(fresh), 1);
     EXPECT_EQ(stack_size(fresh), 0u);
     stack_free(fresh);
-    EXPECT_EQ(stack_valid_handler(fresh), 1);
+    EXPECT_EQ(stack_valid_handler(fresh), 0);
 }
 
 TEST(FreeAllTests, SomeStacksAlreadyFreed)
@@ -290,7 +290,7 @@ TEST(FreeAllTests, SomeStacksAlreadyFreed)
     for (size_t i = 0; i < count; ++i)
     {
         stacks[i] = stack_new();
-        ASSERT_EQ(stack_valid_handler(stacks[i]), 0);
+        ASSERT_EQ(stack_valid_handler(stacks[i]), 1);
     }
     stack_free(stacks[0]);
 
@@ -298,6 +298,6 @@ TEST(FreeAllTests, SomeStacksAlreadyFreed)
 
     for (size_t i = 0; i < count; ++i)
     {
-        EXPECT_EQ(stack_valid_handler(stacks[i]), 1);
+        EXPECT_EQ(stack_valid_handler(stacks[i]), 0);
     }
 }
